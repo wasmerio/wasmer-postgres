@@ -2,7 +2,7 @@ use pg_extend::{pg_error, pg_magic};
 use pg_extern_attr::pg_extern;
 use std::{collections::HashMap, fs::File, io::prelude::*, sync::RwLock};
 use wasmer_runtime::{imports, instantiate, Instance, Value};
-use wasmer_runtime_core::cache::WasmHash;
+use wasmer_runtime_core::{cache::WasmHash, types::Type};
 
 static mut INSTANCES: Option<RwLock<HashMap<String, Instance>>> = None;
 
@@ -46,8 +46,7 @@ fn new_instance(file: String) -> Option<String> {
     }
 }
 
-#[pg_extern]
-fn invoke_function(instance_id: String, function_name: String) -> Option<i64> {
+fn invoke_function(instance_id: String, function_name: String, arguments: &[i64]) -> Option<i64> {
     let instances = get_instances().read().unwrap();
 
     match instances.get(&instance_id) {
@@ -70,7 +69,52 @@ fn invoke_function(instance_id: String, function_name: String) -> Option<i64> {
                 }
             };
 
-            let results = match function.call(&[Value::I32(1), Value::I32(2)]) {
+            let signature = function.signature();
+            let parameters = signature.params();
+            let number_of_parameters = parameters.len() as isize;
+            let number_of_arguments = arguments.len() as isize;
+            let diff: isize = number_of_parameters - number_of_arguments;
+
+            if diff != 0 {
+                pg_error::log(
+                    pg_error::Level::Error,
+                    file!(),
+                    line!(),
+                    module_path!(),
+                    format!(
+                        "Failed to call the `{}` exported function of instance `{}`: Invalid number of arguments.",
+                        function_name, instance_id
+                    ),
+                );
+
+                return None;
+            }
+
+            let mut function_arguments = Vec::<Value>::with_capacity(number_of_parameters as usize);
+
+            for (parameter, argument) in parameters.iter().zip(arguments.iter()) {
+                let value = match parameter {
+                    Type::I32 => Value::I32(*argument as i32),
+                    Type::I64 => Value::I64(*argument),
+                    _ => {
+                        pg_error::log(
+                            pg_error::Level::Error,
+                            file!(),
+                            line!(),
+                            module_path!(),
+                            format!(
+                                "Failed to call the `{}` exported function of instance `{}`: Cannot call it because one of its argument expect a float (`f32` or `f64`), and it is not supported yet by the Postgres extension.",
+                                function_name, instance_id
+                            ),
+                        );
+                        return None;
+                    }
+                };
+
+                function_arguments.push(value);
+            }
+
+            let results = match function.call(function_arguments.as_slice()) {
                 Ok(results) => results,
                 Err(error) => {
                     pg_error::log(
@@ -114,39 +158,69 @@ fn invoke_function(instance_id: String, function_name: String) -> Option<i64> {
 }
 
 #[pg_extern]
-fn sum(x: i32, y: i32) -> i32 {
-    let mut file =
-        File::open("/Users/hywan/Development/Wasmer/pg-ext-wasm/examples/simple.wasm").unwrap();
-    let mut bytes = Vec::new();
-    file.read_to_end(&mut bytes).unwrap();
-
-    let import_object = imports! {};
-    let instance = instantiate(bytes.as_slice(), &import_object).unwrap();
-
-    let values = instance
-        .dyn_func("sum")
-        .unwrap()
-        .call(&[Value::I32(x), Value::I32(y)])
-        .unwrap();
-
-    if let Value::I32(value) = values[0] {
-        value
-    } else {
-        0
-    }
+fn invoke_function_0(instance_id: String, function_name: String) -> Option<i64> {
+    invoke_function(instance_id, function_name, &[])
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[pg_extern]
+fn invoke_function_1(instance_id: String, function_name: String, argument0: i64) -> Option<i64> {
+    invoke_function(instance_id, function_name, &[argument0])
+}
 
-    #[test]
-    fn test_greet() {
-        assert_eq!(&greet("World".into()), "Hello, World!");
-    }
+#[pg_extern]
+fn invoke_function_2(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+) -> Option<i64> {
+    invoke_function(instance_id, function_name, &[argument0, argument1])
+}
 
-    #[test]
-    fn test_sum() {
-        assert_eq!(sum(1, 2), 3);
-    }
+#[pg_extern]
+fn invoke_function_3(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+    argument2: i64,
+) -> Option<i64> {
+    invoke_function(
+        instance_id,
+        function_name,
+        &[argument0, argument1, argument2],
+    )
+}
+
+#[pg_extern]
+fn invoke_function_4(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+    argument2: i64,
+    argument3: i64,
+) -> Option<i64> {
+    invoke_function(
+        instance_id,
+        function_name,
+        &[argument0, argument1, argument2, argument3],
+    )
+}
+
+#[pg_extern]
+fn invoke_function_5(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+    argument2: i64,
+    argument3: i64,
+    argument4: i64,
+) -> Option<i64> {
+    invoke_function(
+        instance_id,
+        function_name,
+        &[argument0, argument1, argument2, argument3, argument4],
+    )
 }
