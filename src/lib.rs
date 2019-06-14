@@ -1,12 +1,21 @@
-use pg_extend::{pg_error, pg_magic};
-use pg_extern_attr::pg_extern;
+use pg_extend::{
+    pg_datum, pg_error,
+    pg_fdw::{ForeignData, ForeignRow, OptionMap},
+    pg_magic, pg_type,
+};
+use pg_extern_attr::{pg_extern, pg_foreignwrapper};
 use std::{collections::HashMap, fs::File, io::prelude::*, sync::RwLock};
 use wasmer_runtime::{imports, instantiate, Instance, Value};
 use wasmer_runtime_core::{cache::WasmHash, types::Type};
 
-static mut INSTANCES: Option<RwLock<HashMap<String, Instance>>> = None;
+struct InstanceInfo {
+    instance: Instance,
+    wasm_file: String,
+}
 
-fn get_instances() -> &'static RwLock<HashMap<String, Instance>> {
+static mut INSTANCES: Option<RwLock<HashMap<String, InstanceInfo>>> = None;
+
+fn get_instances() -> &'static RwLock<HashMap<String, InstanceInfo>> {
     unsafe {
         if INSTANCES.is_none() {
             let lock = RwLock::new(HashMap::new());
@@ -20,8 +29,8 @@ fn get_instances() -> &'static RwLock<HashMap<String, Instance>> {
 pg_magic!(version: pg_sys::PG_VERSION_NUM);
 
 #[pg_extern]
-fn new_instance(file: String) -> Option<String> {
-    let mut file = match File::open(file) {
+fn new_instance(wasm_file: String) -> Option<String> {
+    let mut file = match File::open(&wasm_file) {
         Ok(file) => file,
         Err(_) => return None,
     };
@@ -38,7 +47,13 @@ fn new_instance(file: String) -> Option<String> {
         Ok(instance) => {
             let mut instances = get_instances().write().unwrap();
             let key = WasmHash::generate(bytes.as_slice()).encode();
-            instances.insert(key.clone(), instance);
+            instances.insert(
+                key.clone(),
+                InstanceInfo {
+                    instance,
+                    wasm_file,
+                },
+            );
 
             Some(key)
         }
@@ -50,7 +65,7 @@ fn invoke_function(instance_id: String, function_name: String, arguments: &[i64]
     let instances = get_instances().read().unwrap();
 
     match instances.get(&instance_id) {
-        Some(instance) => {
+        Some(InstanceInfo { instance, .. }) => {
             let function = match instance.dyn_func(&function_name) {
                 Ok(function) => function,
                 Err(error) => {
@@ -223,4 +238,71 @@ fn invoke_function_5(
         function_name,
         &[argument0, argument1, argument2, argument3, argument4],
     )
+}
+
+struct Row {
+    wasm_file: String,
+}
+
+#[pg_foreignwrapper]
+struct InstancesForeignDataWrapper {
+    inner: Vec<Row>,
+}
+
+impl Iterator for InstancesForeignDataWrapper {
+    type Item = Box<ForeignRow>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.inner.pop() {
+            Some(row) => Some(Box::new(InstanceForeignDataWrapper { inner: row })),
+            None => None,
+        }
+    }
+}
+
+impl ForeignData for InstancesForeignDataWrapper {
+    fn begin(_sopts: OptionMap, _topts: OptionMap, _table_name: String) -> Self {
+        InstancesForeignDataWrapper {
+            inner: get_instances()
+                .read()
+                .unwrap()
+                .values()
+                .map(|instance_info| Row {
+                    wasm_file: instance_info.wasm_file.clone(),
+                })
+                .collect(),
+        }
+    }
+
+    fn schema(
+        _server_opts: OptionMap,
+        server_name: String,
+        _remote_schema: String,
+        local_schema: String,
+    ) -> Option<Vec<String>> {
+        Some(vec![format!(
+            "CREATE FOREIGN TABLE {schema}.instances (wasm_file text, export_name text) SERVER {server}",
+            server = server_name,
+            schema = local_schema
+        )])
+    }
+}
+
+struct InstanceForeignDataWrapper {
+    inner: Row,
+}
+
+impl ForeignRow for InstanceForeignDataWrapper {
+    fn get_field(
+        &self,
+        name: &str,
+        _typ: pg_type::PgType,
+        _opts: OptionMap,
+    ) -> Result<Option<pg_datum::PgDatum>, &str> {
+        match name {
+            "wasm_file" => Ok(Some(self.inner.wasm_file.clone().into())),
+            "export_name" => Ok(Some("foo".to_string().into())),
+            _ => Err("Unknown field"),
+        }
+    }
 }
