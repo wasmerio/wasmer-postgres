@@ -5,7 +5,7 @@ use pg_extend::{
 };
 use pg_extern_attr::{pg_extern, pg_foreignwrapper};
 use std::{collections::HashMap, fs::File, io::prelude::*, sync::RwLock};
-use wasmer_runtime::{imports, instantiate, Instance, Value};
+use wasmer_runtime::{imports, instantiate, Export, Instance, Value};
 use wasmer_runtime_core::{cache::WasmHash, types::Type};
 
 struct InstanceInfo {
@@ -242,6 +242,7 @@ fn invoke_function_5(
 
 struct Row {
     wasm_file: String,
+    export_name: String,
 }
 
 #[pg_foreignwrapper]
@@ -267,8 +268,17 @@ impl ForeignData for InstancesForeignDataWrapper {
                 .read()
                 .unwrap()
                 .values()
-                .map(|instance_info| Row {
-                    wasm_file: instance_info.wasm_file.clone(),
+                .flat_map(|instance_info| {
+                    instance_info
+                        .instance
+                        .exports()
+                        .filter_map(move |(export_name, export)| match export {
+                            Export::Function { .. } => Some(Row {
+                                wasm_file: instance_info.wasm_file.clone(),
+                                export_name: export_name.clone(),
+                            }),
+                            _ => None,
+                        })
                 })
                 .collect(),
         }
@@ -301,7 +311,7 @@ impl ForeignRow for InstanceForeignDataWrapper {
     ) -> Result<Option<pg_datum::PgDatum>, &str> {
         match name {
             "wasm_file" => Ok(Some(self.inner.wasm_file.clone().into())),
-            "export_name" => Ok(Some("foo".to_string().into())),
+            "export_name" => Ok(Some(self.inner.export_name.clone().into())),
             _ => Err("Unknown field"),
         }
     }
