@@ -1,0 +1,4 @@
+[build]
+# Informs the linker that some of the symbols for Postgres won't be
+# available until runtime on the dynamic library load.
+rustflags = "-C link-arg=-undefineddynamic_lookup"

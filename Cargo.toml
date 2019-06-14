@@ -1,0 +1,19 @@
+[package]
+publish = false
+name = "pg-ext-wasm"
+version = "0.0.1"
+authors = ["Ivan Enderlin <ivan.enderlin@hoa-project.net>"]
+edition = "2018"
+description = "Postgres extension to run WebAssembly binaries"
+repository = "https://github.com/wasmerio/pg-ext-wasm"
+keywords = ["postgres", "pg", "webassembly", "wasm"]
+categories = ["wasm"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasmer-runtime = "0.4.2"
+wasmer-runtime-core = "0.4.2"
+pg-extend = { git = "https://github.com/bluejekyll/pg-extend-rs", branch = "master" }
+pg-extern-attr = { git = "https://github.com/bluejekyll/pg-extend-rs", branch = "master" }
