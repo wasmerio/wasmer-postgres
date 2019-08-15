@@ -1,5 +1,5 @@
 use pg_extend::{
-    pg_datum, pg_error,
+    error, pg_datum,
     pg_fdw::{ForeignData, ForeignRow, OptionMap},
     pg_magic, pg_type,
 };
@@ -69,15 +69,9 @@ fn invoke_function(instance_id: String, function_name: String, arguments: &[i64]
             let function = match instance.dyn_func(&function_name) {
                 Ok(function) => function,
                 Err(error) => {
-                    pg_error::log(
-                        pg_error::Level::Error,
-                        file!(),
-                        line!(),
-                        module_path!(),
-                        format!(
-                            "Exported function `{}` does not exist in instance `{}`: {}",
-                            function_name, instance_id, error
-                        ),
+                    error!(
+                        "Exported function `{}` does not exist in instance `{}`: {}",
+                        function_name, instance_id, error
                     );
 
                     return None;
@@ -91,15 +85,9 @@ fn invoke_function(instance_id: String, function_name: String, arguments: &[i64]
             let diff: isize = number_of_parameters - number_of_arguments;
 
             if diff != 0 {
-                pg_error::log(
-                    pg_error::Level::Error,
-                    file!(),
-                    line!(),
-                    module_path!(),
-                    format!(
-                        "Failed to call the `{}` exported function of instance `{}`: Invalid number of arguments.",
-                        function_name, instance_id
-                    ),
+                error!(
+                    "Failed to call the `{}` exported function of instance `{}`: Invalid number of arguments.",
+                    function_name, instance_id
                 );
 
                 return None;
@@ -112,16 +100,11 @@ fn invoke_function(instance_id: String, function_name: String, arguments: &[i64]
                     Type::I32 => Value::I32(*argument as i32),
                     Type::I64 => Value::I64(*argument),
                     _ => {
-                        pg_error::log(
-                            pg_error::Level::Error,
-                            file!(),
-                            line!(),
-                            module_path!(),
-                            format!(
-                                "Failed to call the `{}` exported function of instance `{}`: Cannot call it because one of its argument expect a float (`f32` or `f64`), and it is not supported yet by the Postgres extension.",
-                                function_name, instance_id
-                            ),
+                        error!(
+                            "Failed to call the `{}` exported function of instance `{}`: Cannot call it because one of its argument expect a float (`f32` or `f64`), and it is not supported yet by the Postgres extension.",
+                            function_name, instance_id
                         );
+
                         return None;
                     }
                 };
@@ -132,15 +115,9 @@ fn invoke_function(instance_id: String, function_name: String, arguments: &[i64]
             let results = match function.call(function_arguments.as_slice()) {
                 Ok(results) => results,
                 Err(error) => {
-                    pg_error::log(
-                        pg_error::Level::Error,
-                        file!(),
-                        line!(),
-                        module_path!(),
-                        format!(
-                            "Failed to call the `{}` exported function of instance `{}`: {}",
-                            function_name, instance_id, error
-                        ),
+                    error!(
+                        "Failed to call the `{}` exported function of instance `{}`: {}",
+                        function_name, instance_id, error
                     );
 
                     return None;
@@ -159,13 +136,7 @@ fn invoke_function(instance_id: String, function_name: String, arguments: &[i64]
         }
 
         None => {
-            pg_error::log(
-                pg_error::Level::Error,
-                file!(),
-                line!(),
-                module_path!(),
-                format!("Instance with ID `{}` isn't found.", instance_id),
-            );
+            error!("Instance with ID `{}` isn't found.", instance_id);
 
             None
         }
