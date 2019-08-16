@@ -32,9 +32,12 @@ CREATE SCHEMA wasm;
 IMPORT FOREIGN SCHEMA wasm_instances FROM SERVER wasm_instances INTO wasm;
 IMPORT FOREIGN SCHEMA wasm_exported_functions FROM SERVER wasm_exported_functions INTO wasm;
 
-SELECT * FROM wasm.instances;
+--
+-- Get some fun.
+--
 
 CREATE OR REPLACE FUNCTION new_instance(text) RETURNS text AS '/Users/hywan/Development/Wasmer/pg-ext-wasm/target/release/libpg_ext_wasm.dylib', 'pg_new_instance' LANGUAGE C STRICT;
+
 SELECT new_instance('/Users/hywan/Development/Wasmer/pg-ext-wasm/examples/simple.wasm');
 SELECT * FROM wasm.instances;
 SELECT * FROM wasm.exported_functions;
