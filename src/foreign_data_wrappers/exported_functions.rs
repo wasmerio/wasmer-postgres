@@ -9,29 +9,28 @@ use wasmer_runtime::Export;
 
 struct Row {
     instance_id: String,
-    wasm_file: String,
-    export_name: String,
+    name: String,
 }
 
 #[pg_foreignwrapper]
-struct InstancesForeignDataWrapper {
+struct ExportedFunctionsForeignDataWrapper {
     inner: Vec<Row>,
 }
 
-impl Iterator for InstancesForeignDataWrapper {
+impl Iterator for ExportedFunctionsForeignDataWrapper {
     type Item = Box<ForeignRow>;
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.inner.pop() {
-            Some(row) => Some(Box::new(InstanceForeignDataWrapper { inner: row })),
+            Some(row) => Some(Box::new(ExportedFunctionForeignDataWrapper { inner: row })),
             None => None,
         }
     }
 }
 
-impl ForeignData for InstancesForeignDataWrapper {
+impl ForeignData for ExportedFunctionsForeignDataWrapper {
     fn begin(_sopts: OptionMap, _topts: OptionMap, _table_name: String) -> Self {
-        InstancesForeignDataWrapper {
+        ExportedFunctionsForeignDataWrapper {
             inner: get_instances()
                 .read()
                 .unwrap()
@@ -43,8 +42,7 @@ impl ForeignData for InstancesForeignDataWrapper {
                         .filter_map(move |(export_name, export)| match export {
                             Export::Function { .. } => Some(Row {
                                 instance_id: instance_id.clone(),
-                                wasm_file: instance_info.wasm_file.clone(),
-                                export_name: export_name.clone(),
+                                name: export_name.clone(),
                             }),
                             _ => None,
                         })
@@ -60,18 +58,18 @@ impl ForeignData for InstancesForeignDataWrapper {
         local_schema: String,
     ) -> Option<Vec<String>> {
         Some(vec![format!(
-            "CREATE FOREIGN TABLE {schema}.instances (instance_id text, wasm_file text, export_name text) SERVER {server}",
+            "CREATE FOREIGN TABLE {schema}.exported_functions (instance_id text, name text) SERVER {server}",
             server = server_name,
             schema = local_schema
         )])
     }
 }
 
-struct InstanceForeignDataWrapper {
+struct ExportedFunctionForeignDataWrapper {
     inner: Row,
 }
 
-impl ForeignRow for InstanceForeignDataWrapper {
+impl ForeignRow for ExportedFunctionForeignDataWrapper {
     fn get_field(
         &self,
         name: &str,
@@ -80,8 +78,7 @@ impl ForeignRow for InstanceForeignDataWrapper {
     ) -> Result<Option<pg_datum::PgDatum>, &str> {
         match name {
             "instance_id" => Ok(Some(self.inner.instance_id.clone().into())),
-            "wasm_file" => Ok(Some(self.inner.wasm_file.clone().into())),
-            "export_name" => Ok(Some(self.inner.export_name.clone().into())),
+            "name" => Ok(Some(self.inner.name.clone().into())),
             _ => Err("Unknown field"),
         }
     }
