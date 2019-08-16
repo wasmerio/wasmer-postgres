@@ -1,6 +1,7 @@
 use pg_extend::error;
 use pg_extern_attr::pg_extern;
 use std::{collections::HashMap, fs::File, io::prelude::*, sync::RwLock};
+use uuid::Uuid;
 use wasmer_runtime::{imports, instantiate, Instance, Value};
 use wasmer_runtime_core::{cache::WasmHash, types::Type};
 
@@ -40,7 +41,13 @@ fn new_instance(wasm_file: String) -> Option<String> {
     match instantiate(bytes.as_slice(), &import_object) {
         Ok(instance) => {
             let mut instances = get_instances().write().unwrap();
-            let key = WasmHash::generate(bytes.as_slice()).encode();
+            let key = Uuid::new_v5(
+                &Uuid::NAMESPACE_OID,
+                WasmHash::generate(bytes.as_slice()).encode().as_bytes(),
+            )
+            .to_hyphenated()
+            .to_string();
+
             instances.insert(
                 key.clone(),
                 InstanceInfo {
