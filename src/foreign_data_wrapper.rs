@@ -8,6 +8,7 @@ use pg_extern_attr::pg_foreignwrapper;
 use wasmer_runtime::Export;
 
 struct Row {
+    instance_id: String,
     wasm_file: String,
     export_name: String,
 }
@@ -34,13 +35,14 @@ impl ForeignData for InstancesForeignDataWrapper {
             inner: get_instances()
                 .read()
                 .unwrap()
-                .values()
-                .flat_map(|instance_info| {
+                .iter()
+                .flat_map(|(instance_id, instance_info)| {
                     instance_info
                         .instance
                         .exports()
                         .filter_map(move |(export_name, export)| match export {
                             Export::Function { .. } => Some(Row {
+                                instance_id: instance_id.clone(),
                                 wasm_file: instance_info.wasm_file.clone(),
                                 export_name: export_name.clone(),
                             }),
@@ -58,7 +60,7 @@ impl ForeignData for InstancesForeignDataWrapper {
         local_schema: String,
     ) -> Option<Vec<String>> {
         Some(vec![format!(
-            "CREATE FOREIGN TABLE {schema}.instances (wasm_file text, export_name text) SERVER {server}",
+            "CREATE FOREIGN TABLE {schema}.instances (instance_id text, wasm_file text, export_name text) SERVER {server}",
             server = server_name,
             schema = local_schema
         )])
@@ -77,6 +79,7 @@ impl ForeignRow for InstanceForeignDataWrapper {
         _opts: OptionMap,
     ) -> Result<Option<pg_datum::PgDatum>, &str> {
         match name {
+            "instance_id" => Ok(Some(self.inner.instance_id.clone().into())),
             "wasm_file" => Ok(Some(self.inner.wasm_file.clone().into())),
             "export_name" => Ok(Some(self.inner.export_name.clone().into())),
             _ => Err("Unknown field"),
