@@ -13,6 +13,7 @@ categories = ["wasm"]
 crate-type = ["cdylib"]
 
 [dependencies]
+uuid = { version = "0.7", features = ["v5"] }
 wasmer-runtime = "0.6.0"
 wasmer-runtime-core = "0.6.0"
 pg-extend = { git = "https://github.com/bluejekyll/pg-extend-rs", branch = "master" }
