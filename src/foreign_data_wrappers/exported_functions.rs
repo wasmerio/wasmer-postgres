@@ -5,11 +5,13 @@ use pg_extend::{
     pg_type,
 };
 use pg_extern_attr::pg_foreignwrapper;
-use wasmer_runtime::Export;
+use wasmer_runtime::{wasm::Type, Export};
 
 struct Row {
     instance_id: String,
     name: String,
+    inputs: String,
+    outputs: String,
 }
 
 #[pg_foreignwrapper]
@@ -30,6 +32,16 @@ impl Iterator for ExportedFunctionsForeignDataWrapper {
 
 impl ForeignData for ExportedFunctionsForeignDataWrapper {
     fn begin(_sopts: OptionMap, _topts: OptionMap, _table_name: String) -> Self {
+        #[inline]
+        fn wasm_type_to_pg_type(ty: &Type) -> &str {
+            match ty {
+                Type::I32 => "integer",
+                Type::I64 => "bigint",
+                Type::F32 | Type::F64 => "numeric",
+                Type::V128 => "decimal",
+            }
+        }
+
         ExportedFunctionsForeignDataWrapper {
             inner: get_instances()
                 .read()
@@ -40,9 +52,21 @@ impl ForeignData for ExportedFunctionsForeignDataWrapper {
                         .instance
                         .exports()
                         .filter_map(move |(export_name, export)| match export {
-                            Export::Function { .. } => Some(Row {
+                            Export::Function { signature, .. } => Some(Row {
                                 instance_id: instance_id.clone(),
                                 name: export_name.clone(),
+                                inputs: signature
+                                    .params()
+                                    .iter()
+                                    .map(wasm_type_to_pg_type)
+                                    .collect::<Vec<&str>>()
+                                    .join(","),
+                                outputs: signature
+                                    .returns()
+                                    .iter()
+                                    .map(wasm_type_to_pg_type)
+                                    .collect::<Vec<&str>>()
+                                    .join(","),
                             }),
                             _ => None,
                         })
@@ -58,7 +82,7 @@ impl ForeignData for ExportedFunctionsForeignDataWrapper {
         local_schema: String,
     ) -> Option<Vec<String>> {
         Some(vec![format!(
-            "CREATE FOREIGN TABLE {schema}.exported_functions (instance_id text, name text) SERVER {server}",
+            "CREATE FOREIGN TABLE {schema}.exported_functions (instance_id text, name text, inputs text, outputs text) SERVER {server}",
             server = server_name,
             schema = local_schema
         )])
@@ -79,6 +103,8 @@ impl ForeignRow for ExportedFunctionForeignDataWrapper {
         match name {
             "instance_id" => Ok(Some(self.inner.instance_id.clone().into())),
             "name" => Ok(Some(self.inner.name.clone().into())),
+            "inputs" => Ok(Some(self.inner.inputs.clone().into())),
+            "outputs" => Ok(Some(self.inner.outputs.clone().into())),
             _ => Err("Unknown field"),
         }
     }
