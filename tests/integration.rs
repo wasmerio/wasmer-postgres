@@ -15,6 +15,7 @@ fn sql_vs_expected_output() {
         .expect("Failed to run `src/wasm.sql` with `psql");
 
     let fixtures_directory = Path::new("./tests/sql");
+    let wasm_init = OsStr::new("_wasm_init.sql");
     let sql = OsStr::new("sql");
     let pwd = var("PWD").expect("Cannot read `$PWD`.");
 
@@ -47,6 +48,10 @@ fn sql_vs_expected_output() {
                 } else {
                     panic!("Failed to retrieve the output of `psql`.");
                 };
+
+                if input_path.file_name() == Some(wasm_init) {
+                    continue;
+                }
 
                 let expected_path = input_path.as_path().with_extension("expected_output");
                 let expected_output = fs::read_to_string(&expected_path)
