@@ -66,6 +66,16 @@ SELECT name, inputs, outputs FROM wasm.exported_functions WHERE instance_id = '4
 This reflection mechanism is using foreign schema, and foreign data
 wrappers. It is used to create the exported functions in SQL directly.
 
+# Test
+
+To run the test, run the following commands:
+
+```shell
+$ just pg-start
+$ just pg-run-one-file tests/sql/_wasm_init.sql
+$ just test
+```
+
 # Cautions
 
 Doesn't work with PostgreSQL 11 yet (see https://github.com/bluejekyll/pg-extend-rs/issues/49).
