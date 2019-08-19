@@ -211,3 +211,115 @@ fn invoke_function_5(
         &[argument0, argument1, argument2, argument3, argument4],
     )
 }
+
+#[pg_extern]
+fn invoke_function_6(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+    argument2: i64,
+    argument3: i64,
+    argument4: i64,
+    argument5: i64,
+) -> Option<i64> {
+    invoke_function(
+        instance_id,
+        function_name,
+        &[
+            argument0, argument1, argument2, argument3, argument4, argument5,
+        ],
+    )
+}
+
+#[pg_extern]
+fn invoke_function_7(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+    argument2: i64,
+    argument3: i64,
+    argument4: i64,
+    argument5: i64,
+    argument6: i64,
+) -> Option<i64> {
+    invoke_function(
+        instance_id,
+        function_name,
+        &[
+            argument0, argument1, argument2, argument3, argument4, argument5, argument6,
+        ],
+    )
+}
+
+#[pg_extern]
+fn invoke_function_8(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+    argument2: i64,
+    argument3: i64,
+    argument4: i64,
+    argument5: i64,
+    argument6: i64,
+    argument7: i64,
+) -> Option<i64> {
+    invoke_function(
+        instance_id,
+        function_name,
+        &[
+            argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7,
+        ],
+    )
+}
+
+#[pg_extern]
+fn invoke_function_9(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+    argument2: i64,
+    argument3: i64,
+    argument4: i64,
+    argument5: i64,
+    argument6: i64,
+    argument7: i64,
+    argument8: i64,
+) -> Option<i64> {
+    invoke_function(
+        instance_id,
+        function_name,
+        &[
+            argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7,
+            argument8,
+        ],
+    )
+}
+
+#[pg_extern]
+fn invoke_function_10(
+    instance_id: String,
+    function_name: String,
+    argument0: i64,
+    argument1: i64,
+    argument2: i64,
+    argument3: i64,
+    argument4: i64,
+    argument5: i64,
+    argument6: i64,
+    argument7: i64,
+    argument8: i64,
+    argument9: i64,
+) -> Option<i64> {
+    invoke_function(
+        instance_id,
+        function_name,
+        &[
+            argument0, argument1, argument2, argument3, argument4, argument5, argument6, argument7,
+            argument8, argument9,
+        ],
+    )
+}
