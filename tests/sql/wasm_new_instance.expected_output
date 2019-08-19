@@ -1,0 +1,26 @@
+BEGIN
+          wasm_new_instance           
+--------------------------------------
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15
+(1 row)
+
+                  id                  |                             wasm_file                             
+--------------------------------------+-------------------------------------------------------------------
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | %cwd%/tests/wasm/tests.wasm
+(1 row)
+
+             instance_id              |        name         |             inputs             | outputs 
+--------------------------------------+---------------------+--------------------------------+---------
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | i64_i64             | bigint                         | bigint
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | string              |                                | integer
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | f64_f64             | numeric                        | numeric
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | f32_f32             | numeric                        | numeric
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | bool_casted_to_i32  |                                | integer
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | i32_i32             | integer                        | integer
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | arity_0             |                                | integer
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | sum                 | integer,integer                | integer
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | i32_i64_f32_f64_f64 | integer,bigint,numeric,numeric | numeric
+ fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15 | void                |                                | 
+(10 rows)
+
+ROLLBACK

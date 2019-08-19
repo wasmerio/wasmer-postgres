@@ -1,0 +1,5 @@
+BEGIN TRANSACTION;
+
+SELECT * FROM wasm.instances;
+
+ROLLBACK;
