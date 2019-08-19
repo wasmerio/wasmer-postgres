@@ -70,6 +70,7 @@ CREATE OR REPLACE FUNCTION wasm_new_instance(module_pathname text, namespace tex
 DECLARE
     current_instance_id text;
     exported_function RECORD;
+    exported_function_generated_inputs text;
 BEGIN
     -- Create a new instance, and stores its ID in `current_instance_id`.
     SELECT wasm__new_instance(module_pathname) INTO STRICT current_instance_id;
@@ -92,12 +93,18 @@ BEGIN
            RAISE EXCEPTION 'WebAssembly exported function `%` has an arity greater than 10, which is not supported yet.', exported_function.name;
         END IF;
 
+        exported_function_generated_inputs := '';
+
+        FOR nth IN 1..exported_function.input_arity LOOP
+            exported_function_generated_inputs := exported_function_generated_inputs || format(', $%s', nth);
+        END LOOP;
+
         EXECUTE format(
             'CREATE OR REPLACE FUNCTION %I_%I(%3$s) RETURNS %5$s AS $F$' ||
             'DECLARE' ||
             '    output %5$s;' ||
             'BEGIN' ||
-            '    SELECT wasm__invoke_function_%4$s(''%6$s'', ''%2$s'', $1, $2) INTO STRICT output;' ||
+            '    SELECT wasm__invoke_function_%4$s(''%6$s'', ''%2$s''%7$s) INTO STRICT output;' ||
             '    RETURN output;' ||
             'END;' ||
             '$F$ LANGUAGE plpgsql;',
@@ -106,7 +113,8 @@ BEGIN
             exported_function.inputs, -- 3
             exported_function.input_arity, -- 4
             exported_function.outputs, -- 5
-            current_instance_id -- 6
+            current_instance_id, -- 6
+            exported_function_generated_inputs -- 7
         );
     END LOOP;
 
