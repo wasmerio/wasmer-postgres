@@ -8,15 +8,15 @@ test:
 
 # Initialize Postgres.
 pg-init:
-	pg_ctl init -D $(pwd)/test/pg
+	pg_ctl init -D $(pwd)/tests/pg
 
 # Start Postgres.
 pg-start:
-	pg_ctl start -D $(pwd)/test/pg -l $(pwd)/test/pg/pg.log
+	pg_ctl start -D $(pwd)/tests/pg -l $(pwd)/tests/pg/pg.log
 
 # Stop Postgres.
 pg-stop:
-	pg_ctl stop -D $(pwd)/test/pg 
+	pg_ctl stop -D $(pwd)/tests/pg 
 
 # Start a shell into Postgres.
 pg-shell:
