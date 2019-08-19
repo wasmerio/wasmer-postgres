@@ -22,6 +22,9 @@ pg-stop:
 pg-shell:
 	psql -d postgres
 
+pg-run-one-file FILE:
+	sed -e "s,%cwd%,$(pwd)," {{FILE}} | psql -d postgres | sed -e "s,$(pwd),%cwd%,"
+
 # Local Variables:
 # mode: makefile
 # End:
