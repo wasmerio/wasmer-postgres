@@ -50,16 +50,16 @@ BEGIN
 
     -- Function `wasm__invoke_function_*`
     EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_0(text, text) RETURNS int AS ''%s'', ''pg_invoke_function_0'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int) RETURNS int AS ''%s'', ''pg_invoke_function_1'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_2'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_3'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_4'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int, int, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_5'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int, int, int, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_6'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int, int, int, int, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_7'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int, int, int, int, int, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_8'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int, int, int, int, int, int, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_9'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int, int, int, int, int, int, int, int, int, int) RETURNS int AS ''%s'', ''pg_invoke_function_10'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_1'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_2(text, text, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_2'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_3(text, text, bigint, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_3'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_4(text, text, bigint, bigint, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_4'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_5(text, text, bigint, bigint, bigint, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_5'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_6(text, text, bigint, bigint, bigint, bigint, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_6'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_7(text, text, bigint, bigint, bigint, bigint, bigint, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_7'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_8(text, text, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_8'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_9(text, text, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_9'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_10(text, text, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint) RETURNS int AS ''%s'', ''pg_invoke_function_10'' LANGUAGE C STRICT', dylib_pathname);
 
     RETURN TRUE;
 END;
@@ -96,7 +96,7 @@ BEGIN
         exported_function_generated_inputs := '';
 
         FOR nth IN 1..exported_function.input_arity LOOP
-            exported_function_generated_inputs := exported_function_generated_inputs || format(', $%s', nth);
+            exported_function_generated_inputs := exported_function_generated_inputs || format(', CAST($%s AS bigint)', nth);
         END LOOP;
 
         EXECUTE format(
