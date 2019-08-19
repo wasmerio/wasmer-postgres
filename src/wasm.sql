@@ -1,3 +1,5 @@
+SET plpgsql.extra_warnings TO 'shadowed_variables';
+
 CREATE OR REPLACE FUNCTION wasm_init(dylib_pathname text) RETURNS boolean AS $$
 DECLARE
     wasm_schema_name CONSTANT text := 'wasm';
