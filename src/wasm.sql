@@ -45,9 +45,7 @@ BEGIN
         IMPORT FOREIGN SCHEMA wasm_exported_functions FROM SERVER wasm_exported_functions INTO wasm;
     END;
 
-    --
     -- Function `wasm__new_instance`
-    --
     EXECUTE format('CREATE OR REPLACE FUNCTION wasm__new_instance(text) RETURNS text AS ''%s'', ''pg_new_instance'' LANGUAGE C STRICT', dylib_pathname);
 
     -- Function `wasm__invoke_function_*`
