@@ -7,14 +7,14 @@ BEGIN
     --
     BEGIN
         EXECUTE format(
-            'CREATE OR REPLACE FUNCTION InstancesForeignDataWrapper() RETURNS fdw_handler AS ''%s'', ''fdw_InstancesForeignDataWrapper'' LANGUAGE C STRICT',
+            'CREATE OR REPLACE FUNCTION wasm__instances_foreign_data_wrapper() RETURNS fdw_handler AS ''%s'', ''fdw_InstancesForeignDataWrapper'' LANGUAGE C STRICT',
             dylib_pathname
         );
-        DROP FOREIGN DATA WRAPPER IF EXISTS InstancesForeignDataWrapper CASCADE;
-        CREATE FOREIGN DATA WRAPPER InstancesForeignDataWrapper handler InstancesForeignDataWrapper NO VALIDATOR;
+        DROP FOREIGN DATA WRAPPER IF EXISTS wasm__instances_foreign_data_wrapper CASCADE;
+        CREATE FOREIGN DATA WRAPPER wasm__instances_foreign_data_wrapper handler wasm__instances_foreign_data_wrapper NO VALIDATOR;
 
         DROP SERVER IF EXISTS wasm_instances CASCADE;
-        CREATE SERVER wasm_instances FOREIGN DATA WRAPPER InstancesForeignDataWrapper;
+        CREATE SERVER wasm_instances FOREIGN DATA WRAPPER wasm__instances_foreign_data_wrapper;
     END;
 
     --
@@ -22,14 +22,14 @@ BEGIN
     --
     BEGIN
         EXECUTE format(
-            'CREATE OR REPLACE FUNCTION ExportedFunctionsForeignDataWrapper() RETURNS fdw_handler AS ''%s'', ''fdw_ExportedFunctionsForeignDataWrapper'' LANGUAGE C STRICT',
+            'CREATE OR REPLACE FUNCTION wasm__exported_functions_foreign_data_wrapper() RETURNS fdw_handler AS ''%s'', ''fdw_ExportedFunctionsForeignDataWrapper'' LANGUAGE C STRICT',
             dylib_pathname
         );
-        DROP FOREIGN DATA WRAPPER IF EXISTS ExportedFunctionsForeignDataWrapper CASCADE;
-        CREATE FOREIGN DATA WRAPPER ExportedFunctionsForeignDataWrapper handler ExportedFunctionsForeignDataWrapper NO VALIDATOR;
+        DROP FOREIGN DATA WRAPPER IF EXISTS wasm__exported_functions_foreign_data_wrapper CASCADE;
+        CREATE FOREIGN DATA WRAPPER wasm__exported_functions_foreign_data_wrapper handler wasm__exported_functions_foreign_data_wrapper NO VALIDATOR;
 
         DROP SERVER IF EXISTS wasm_exported_functions CASCADE;
-        CREATE SERVER wasm_exported_functions FOREIGN DATA WRAPPER ExportedFunctionsForeignDataWrapper;
+        CREATE SERVER wasm_exported_functions FOREIGN DATA WRAPPER wasm__exported_functions_foreign_data_wrapper;
     END;
 
     --
