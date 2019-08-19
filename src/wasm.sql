@@ -73,6 +73,7 @@ DECLARE
     current_instance_id text;
     exported_function RECORD;
     exported_function_generated_inputs text;
+    exported_function_generated_outputs text;
 BEGIN
     -- Create a new instance, and stores its ID in `current_instance_id`.
     SELECT wasm__new_instance(module_pathname) INTO STRICT current_instance_id;
@@ -84,7 +85,10 @@ BEGIN
         SELECT
             name,
             inputs,
-            array_length(regexp_split_to_array(inputs, ','), 1) AS input_arity,
+            CASE
+                WHEN length(inputs) = 0 THEN 0
+                ELSE array_length(regexp_split_to_array(inputs, ','), 1)
+            END AS input_arity,
             outputs
         FROM
             wasm.exported_functions
@@ -96,10 +100,17 @@ BEGIN
         END IF;
 
         exported_function_generated_inputs := '';
+        exported_function_generated_outputs := '';
 
         FOR nth IN 1..exported_function.input_arity LOOP
             exported_function_generated_inputs := exported_function_generated_inputs || format(', CAST($%s AS bigint)', nth);
         END LOOP;
+
+        IF length(exported_function.outputs) > 0 THEN
+            exported_function_generated_outputs := exported_function.outputs;
+        ELSE
+            exported_function_generated_outputs := 'integer';
+        END IF;
 
         EXECUTE format(
             'CREATE OR REPLACE FUNCTION %I_%I(%3$s) RETURNS %5$s AS $F$' ||
@@ -114,7 +125,7 @@ BEGIN
             exported_function.name, -- 2
             exported_function.inputs, -- 3
             exported_function.input_arity, -- 4
-            exported_function.outputs, -- 5
+            exported_function_generated_outputs, -- 5
             current_instance_id, -- 6
             exported_function_generated_inputs -- 7
         );
