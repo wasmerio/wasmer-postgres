@@ -72,7 +72,6 @@ To run the test, run the following commands:
 
 ```shell
 $ just pg-start
-$ just pg-run-one-file tests/sql/_wasm_init.sql
 $ just test
 ```
 

@@ -19,8 +19,14 @@ fn sql_vs_expected_output() {
     let sql = OsStr::new("sql");
     let pwd = var("PWD").expect("Cannot read `$PWD`.");
 
-    for entry in fs::read_dir(fixtures_directory).unwrap() {
-        let entry = entry.unwrap();
+    let mut entries: Vec<_> = fs::read_dir(fixtures_directory)
+        .unwrap()
+        .map(|entry| entry.unwrap())
+        .collect();
+    entries.sort_by_key(|entry| entry.path());
+
+    for entry in entries {
+        let entry = entry;
         let input_path = entry.path();
 
         if let Some(extension) = input_path.extension() {

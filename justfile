@@ -3,8 +3,8 @@ build:
 	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo build --release
 
 # Test the `wasmer` extension.
-test:
-	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test
+test OPTIONS='':
+	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test {{OPTIONS}}
 
 # Initialize Postgres.
 pg-init:
