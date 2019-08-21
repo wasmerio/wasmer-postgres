@@ -5,7 +5,8 @@ jobs:
   # Build and test the project.
   build-and-test:
     docker:
-      - image: circleci/postgres:10.9
+      - image: circleci/rust:latest
+      - image: circleci/postgres:10.9-ram
         environment:
           POSTGRES_USER: root
           POSTGRES_DB: postgres
@@ -14,47 +15,52 @@ jobs:
       # Update the project.
       - checkout
 
-      # Install tools.
       - run:
-          name: Install tools
+          name: Foo
           command: |
-              apt-get update
-              apt-get install --quiet --yes curl clang postgresql-server-dev-10
+            return 1
 
-      # Install Rust.
-      - run:
-          name: Install Rust
-          command: |
-              test -d /usr/local/cargo || curl https://sh.rustup.rs -sSf | sh -s -- -y
-
-      # Install `just` used to manage the project.
-      - run:
-          name: Install just
-          command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              test -f $HOME/.cargo/bin/just || cargo install just
-
-      # Build the extension.
-      - run:
-          name: Build the extension
-          command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              just build
-
-      # Initialize a Postgres database.
-      - run:
-          name: Set up Postgres
-          command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              just pg-init
-
-      # Run the extension test suites.
-      - run:
-          name: Test the extension
-          command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              just pg-start
-              just test
+#      # Install tools.
+#      - run:
+#          name: Install tools
+#          command: |
+#              apt-get update
+#              apt-get install --quiet --yes curl clang postgresql-server-dev-10
+#
+#      # Install Rust.
+#      - run:
+#          name: Install Rust
+#          command: |
+#              test -d /usr/local/cargo || curl https://sh.rustup.rs -sSf | sh -s -- -y
+#
+#      # Install `just` used to manage the project.
+#      - run:
+#          name: Install just
+#          command: |
+#              export PATH="$HOME/.cargo/bin:$PATH"
+#              test -f $HOME/.cargo/bin/just || cargo install just
+#
+#      # Build the extension.
+#      - run:
+#          name: Build the extension
+#          command: |
+#              export PATH="$HOME/.cargo/bin:$PATH"
+#              just build
+#
+#      # Initialize a Postgres database.
+#      - run:
+#          name: Set up Postgres
+#          command: |
+#              export PATH="$HOME/.cargo/bin:$PATH"
+#              just pg-init
+#
+#      # Run the extension test suites.
+#      - run:
+#          name: Test the extension
+#          command: |
+#              export PATH="$HOME/.cargo/bin:$PATH"
+#              just pg-start
+#              just test
 
 
 # List of workflows.
