@@ -14,10 +14,12 @@ jobs:
       - run:
           name: Install Postgresql
           command: |
+            sudo apt-get update
+            sudo apt-get install lsb-release
             wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
             sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list'
             sudo apt-get update
-            sudo apt-get install --quiet --yes postgresql-server-10 postgresql-server-dev-10 postgresql-client-10
+            sudo apt-get install --quiet --yes postgresql-10 postgresql-server-dev-10 postgresql-client-10
 
       # Install Clang.
       - run:
@@ -29,24 +31,24 @@ jobs:
       - run:
           name: Install just
           command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              test -f $HOME/.cargo/bin/just || cargo install just
+            export PATH="$HOME/.cargo/bin:$PATH"
+            test -f $HOME/.cargo/bin/just || cargo install just
 
       # Build the extension.
       - run:
           name: Build the extension
           command: |
-              export PATH="/usr/lib/postgresql/10/bin:$HOME/.cargo/bin:$PATH"
-              just build
+            export PATH="/usr/lib/postgresql/10/bin:$HOME/.cargo/bin:$PATH"
+            just build
 
       # Run the extension test suites.
       - run:
           name: Test the extension
           command: |
-              export PATH="/usr/lib/postgresql/10/bin:$HOME/.cargo/bin:$PATH"
-              just pg-init
-              just pg-start
-              just test $USER postgres
+            export PATH="/usr/lib/postgresql/10/bin:$HOME/.cargo/bin:$PATH"
+            just pg-init
+            just pg-start
+            just test $USER postgres
 
 
 # List of workflows.

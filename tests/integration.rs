@@ -9,22 +9,16 @@ use std::{
 
 #[test]
 fn sql_vs_expected_output() {
-    let user = var("POSTGRES_USER").expect("Cannot read `$POSTGRES_USER`.");
-    let database = var("POSTGRES_DB").expect("Cannot read `$POSTGRES_DB`.");
-    let psql_d = &format!(
-        "postgres://{user}@localhost:5432/{database}",
-        user = user,
-        database = database
-    );
+    let pwd = var("PWD").expect("Cannot read `$PWD`.");
+    let psql_h = &format!("{cwd}/tests/pg", cwd = pwd);
     Command::new("psql")
-        .args(&["-d", psql_d, "-f", "src/wasm.sql"])
+        .args(&["-h", psql_h, "-d", "postgres", "-f", "src/wasm.sql"])
         .output()
         .expect("Failed to run `src/wasm.sql` with `psql");
 
     let fixtures_directory = Path::new("./tests/sql");
     let wasm_init = OsStr::new("_wasm_init.sql");
     let sql = OsStr::new("sql");
-    let pwd = var("PWD").expect("Cannot read `$PWD`.");
 
     let mut entries: Vec<_> = fs::read_dir(fixtures_directory)
         .unwrap()
@@ -42,7 +36,7 @@ fn sql_vs_expected_output() {
                     .unwrap()
                     .replace("%cwd%", &pwd);
                 let mut psql = Command::new("psql")
-                    .args(&["-d", psql_d])
+                    .args(&["-h", psql_h, "-d", "postgres"])
                     .stdin(Stdio::piped())
                     .stdout(Stdio::piped())
                     .stderr(Stdio::piped())
