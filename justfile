@@ -3,8 +3,11 @@ build:
 	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo build --release
 
 # Test the `wasmer` extension.
-test OPTIONS='':
-	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test {{OPTIONS}}
+test POSTGRES_USER='$USER' POSTGRES_DB='postgres':
+	PG_INCLUDE_PATH=$(pg_config --includedir-server) \
+	POSTGRES_USER={{POSTGRES_USER}} \
+	POSTGRES_DB={{POSTGRES_DB}} \
+		cargo test
 
 # Initialize Postgres.
 pg-init:
@@ -20,7 +23,7 @@ pg-stop:
 
 # Start a shell into Postgres.
 pg-shell:
-	psql -d postgres
+	psql -d postgresql://$USER@localhost:5432/postgres
 
 pg-run-one-file FILE:
 	sed -e "s,%cwd%,$(pwd)," {{FILE}} | psql -d postgres | sed -e "s,$(pwd),%cwd%,"

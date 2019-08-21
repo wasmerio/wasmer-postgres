@@ -9,8 +9,15 @@ use std::{
 
 #[test]
 fn sql_vs_expected_output() {
+    let user = var("POSTGRES_USER").expect("Cannot read `$POSTGRES_USER`.");
+    let database = var("POSTGRES_DB").expect("Cannot read `$POSTGRES_DB`.");
+    let psql_d = &format!(
+        "postgres://{user}@localhost:5432/{database}",
+        user = user,
+        database = database
+    );
     Command::new("psql")
-        .args(&["-d", "postgres", "-f", "src/wasm.sql"])
+        .args(&["-d", psql_d, "-f", "src/wasm.sql"])
         .output()
         .expect("Failed to run `src/wasm.sql` with `psql");
 
@@ -35,7 +42,7 @@ fn sql_vs_expected_output() {
                     .unwrap()
                     .replace("%cwd%", &pwd);
                 let mut psql = Command::new("psql")
-                    .args(&["-d", "postgres"])
+                    .args(&["-d", psql_d])
                     .stdin(Stdio::piped())
                     .stdout(Stdio::piped())
                     .stderr(Stdio::piped())
