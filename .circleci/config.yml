@@ -14,6 +14,8 @@ jobs:
       - run:
           name: Install Rust
           command: |
+              apt-get update
+              apt-get install curl
               test -d /usr/local/cargo || curl https://sh.rustup.rs -sSf | sh -s -- -y
 
       # Install `just` used to manage the project.
