@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://wasmer.io" target="_blank" rel="noopener noreferrer">
+    <img width="400" src="https://raw.githubusercontent.com/wasmerio/wasmer/master/logo.png" alt="Wasmer logo">
+  </a>
+</p>
+
 Just because lol, why not!
 
 # Usage
