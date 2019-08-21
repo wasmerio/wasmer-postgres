@@ -4,7 +4,8 @@ build:
 
 # Test the `wasmer` extension.
 test:
-	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test
+	echo "SELECT wasm_init('$(find $(pwd)/target/release -depth 1 \( -name 'libpg_ext_wasm.dylib' -or -name 'libpg_ext_wasm.so' \))');" > psql -h $(pwd)/tests/pg -d postgres
+	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test --release
 
 # Initialize Postgres.
 pg-init:

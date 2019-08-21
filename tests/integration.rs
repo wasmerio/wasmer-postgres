@@ -17,17 +17,10 @@ fn sql_vs_expected_output() {
         .expect("Failed to run `src/wasm.sql` with `psql");
 
     let fixtures_directory = Path::new("./tests/sql");
-    let wasm_init = OsStr::new("_wasm_init.sql");
     let sql = OsStr::new("sql");
 
-    let mut entries: Vec<_> = fs::read_dir(fixtures_directory)
-        .unwrap()
-        .map(|entry| entry.unwrap())
-        .collect();
-    entries.sort_by_key(|entry| entry.path());
-
-    for entry in entries {
-        let entry = entry;
+    for entry in fs::read_dir(fixtures_directory).unwrap() {
+        let entry = entry.unwrap();
         let input_path = entry.path();
 
         if let Some(extension) = input_path.extension() {
@@ -55,10 +48,6 @@ fn sql_vs_expected_output() {
                 } else {
                     panic!("Failed to retrieve the output of `psql`.");
                 };
-
-                if input_path.file_name() == Some(wasm_init) {
-                    continue;
-                }
 
                 let expected_path = input_path.as_path().with_extension("expected_output");
                 let expected_output = fs::read_to_string(&expected_path)
