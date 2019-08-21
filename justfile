@@ -4,7 +4,7 @@ build:
 
 # Test the `wasmer` extension.
 test:
-	echo "SELECT wasm_init('$(find $(pwd)/target/release -depth 1 \( -name 'libpg_ext_wasm.dylib' -or -name 'libpg_ext_wasm.so' \))');" > psql -h $(pwd)/tests/pg -d postgres
+	echo "SELECT wasm_init('$(find $(pwd)/target/release -depth 1 \( -name 'libpg_ext_wasm.dylib' -or -name 'libpg_ext_wasm.so' \))');" | psql -h $(pwd)/tests/pg -d postgres
 	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test --release
 
 # Initialize Postgres.
@@ -24,7 +24,7 @@ pg-shell:
 	psql -h $(pwd)/tests/pg -d postgres
 
 pg-run-one-file FILE:
-	sed -e "s,%cwd%,$(pwd)," {{FILE}} | psql -d postgres | sed -e "s,$(pwd),%cwd%,"
+	sed -e "s,%cwd%,$(pwd)," {{FILE}} | psql -h $(pwd)/tests/pg -d postgres --no-align | sed -e "s,$(pwd),%cwd%,"
 
 # Local Variables:
 # mode: makefile

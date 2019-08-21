@@ -1,6 +1,4 @@
 BEGIN
- id | wasm_file 
-----+-----------
+id|wasm_file
 (0 rows)
-
 ROLLBACK

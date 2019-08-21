@@ -1,42 +1,26 @@
 BEGIN
-          wasm_new_instance           
---------------------------------------
- fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15
+wasm_new_instance
+fcbbe7f2-0875-5f28-83ff-0c5ea9dacd15
 (1 row)
-
-  type   | x 
----------+---
- integer | 3
+type|x
+integer|3
 (1 row)
-
-  type   | x  
----------+----
- integer | 42
+type|x
+integer|42
 (1 row)
-
-  type   | x 
----------+---
- integer | 7
+type|x
+integer|7
 (1 row)
-
-  type  | x 
---------+---
- bigint | 7
+type|x
+bigint|7
 (1 row)
-
-  type   | x 
----------+---
- integer | 1
+type|x
+integer|1
 (1 row)
-
-  type   |    x    
----------+---------
- integer | 1048576
+type|x
+integer|1048576
 (1 row)
-
-  type   | x 
----------+---
- integer |  
+type|x
+integer|
 (1 row)
-
 ROLLBACK
