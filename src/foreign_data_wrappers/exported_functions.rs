@@ -35,8 +35,8 @@ impl ForeignData for ExportedFunctionsForeignDataWrapper {
         #[inline]
         fn wasm_type_to_pg_type(ty: &Type) -> &str {
             match ty {
-                Type::I32 => "integer",
-                Type::I64 => "bigint",
+                Type::I32 => "int4",
+                Type::I64 => "int8",
                 Type::F32 | Type::F64 => "numeric",
                 Type::V128 => "decimal",
             }
