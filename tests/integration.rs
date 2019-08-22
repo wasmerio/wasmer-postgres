@@ -11,11 +11,6 @@ use std::{
 fn sql_vs_expected_output() {
     let pwd = var("PWD").expect("Cannot read `$PWD`.");
     let psql_h = &format!("{cwd}/tests/pg", cwd = pwd);
-    Command::new("psql")
-        .args(&["-h", psql_h, "-d", "postgres", "-f", "src/wasm.sql"])
-        .output()
-        .expect("Failed to run `src/wasm.sql` with `psql");
-
     let fixtures_directory = Path::new("./tests/sql");
     let sql = OsStr::new("sql");
 

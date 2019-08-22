@@ -16,6 +16,7 @@ test:
 		*)
 			dylib_extension="so"
 	esac
+	cat src/wasm.sql | psql -h $(pwd)/tests/pg -d postgres
 	echo "SELECT wasm_init('$(pwd)/target/release/libpg_ext_wasm.${dylib_extension}');" | psql -h $(pwd)/tests/pg -d postgres --echo-all
 	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test --release
 
