@@ -3,47 +3,52 @@ version: 2.1
 # List of all jobs.
 jobs:
   # Build and test the project.
-  build_and_test:
+  build-and-test:
     docker:
-      - image: circleci/postgres:10.9
+      - image: circleci/rust:latest
     steps:
       # Update the project.
       - checkout
 
-      # Install Rust.
+      # Install Postgresql.
       - run:
-          name: Install Rust
+          name: Install Postgresql
           command: |
-              test -d /usr/local/cargo || curl https://sh.rustup.rs -sSf | sh -s -- -y
+            sudo apt-get update
+            sudo apt-get install lsb-release
+            wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+            sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list'
+            sudo apt-get update
+            sudo apt-get install --quiet --yes postgresql-10 postgresql-server-dev-10 postgresql-client-10
+
+      # Install Clang.
+      - run:
+          name: Install Clang
+          command: |
+            sudo apt-get install --quiet --yes clang
 
       # Install `just` used to manage the project.
       - run:
           name: Install just
           command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              test -f $HOME/.cargo/bin/just || cargo install just
+            export PATH="$HOME/.cargo/bin:$PATH"
+            test -f $HOME/.cargo/bin/just || cargo install just
 
       # Build the extension.
       - run:
           name: Build the extension
           command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              just build
-
-      # Initialize a Postgres database.
-      - run:
-          name: Set up Postgres
-          command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              just pg-init
+            export PATH="/usr/lib/postgresql/10/bin:$HOME/.cargo/bin:$PATH"
+            just build
 
       # Run the extension test suites.
       - run:
           name: Test the extension
           command: |
-              export PATH="$HOME/.cargo/bin:$PATH"
-              just pg-start
-              just test
+            export PATH="/usr/lib/postgresql/10/bin:$HOME/.cargo/bin:$PATH"
+            just pg-init
+            just pg-start
+            just test
 
 
 # List of workflows.
@@ -53,12 +58,13 @@ workflows:
   # The build workflow.
   build:
     jobs:
-      # Run the `build_and_test` job for all branches and all tags.
-      - build_and_test:
+      # Run the `build-and-test` job for the `trying` and `staging` branches and all tags.
+      - build-and-test:
           filters:
             branches:
-              only:
-                - trying
-                - staging
+              only: /.*/
+              #only:
+              #  - trying
+              #  - staging
             tags:
               only: /.*/
