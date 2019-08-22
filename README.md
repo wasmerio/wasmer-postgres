@@ -41,7 +41,7 @@ $ cat src/wasm.sql | \
       psql -h $host -d $database
 
 $ # Initialize the extension.
-$ echo "SELECT wasm_init('$(pwd)/target/release/libpg_ext_wasm.dylib);" | \
+$ echo "SELECT wasm_init('$(pwd)/target/release/libpg_ext_wasm.dylib');" | \
       psql -h $host -d $database
 ```
 
