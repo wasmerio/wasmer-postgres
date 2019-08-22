@@ -173,6 +173,59 @@ WHERE
 -- (1 row)
 ```
 
+# Benchmarks
+
+Benchmarks are useless most of the time, but it shows that WebAssembly
+can be a credible alternative to procedural languages such as
+PL/pgSQL. Please, don't take those numbers for granted, it can change
+at any time, but it shows promising results:
+
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th>Runtime</th>
+      <th align="right">Time (ms)</th>
+      <th align="right">Ratio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2">Fibonacci (n = 50)</td>
+      <td><code>postgres-ext-wasm</code></td>
+      <td align="right">0.206</td>
+      <td align="right">1×</td>
+    </tr>
+    <tr>
+      <td>PL/pgSQL</td>
+      <td align="right">0.431</td>
+      <td align="right">2×</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Fibonacci (n = 500)</td>
+      <td><code>postgres-ext-wasm</code></td>
+      <td align="right">0.217</td>
+      <td align="right">1×</td>
+    </tr>
+    <tr>
+      <td>PL/pgSQL</td>
+      <td align="right">2.189</td>
+      <td align="right">10×</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Fibonacci (n = 5000)</td>
+      <td><code>postgres-ext-wasm</code></td>
+      <td align="right">0.257</td>
+      <td align="right">1×</td>
+    </tr>
+    <tr>
+      <td>PL/pgSQL</td>
+      <td align="right">18.643</td>
+      <td align="right">73×</td>
+    </tr>
+  </tbody>
+</table>
+
 # Test
 
 Once the library is built, run the following commands:
