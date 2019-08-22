@@ -4,7 +4,19 @@ build:
 
 # Test the `wasmer` extension.
 test:
-	echo "SELECT wasm_init('$(find $(pwd)/target/release -depth 1 \( -name 'libpg_ext_wasm.dylib' -or -name 'libpg_ext_wasm.so' \))');" | psql -h $(pwd)/tests/pg -d postgres
+	#!/usr/bin/env bash
+	set -euo pipefail
+	case "{{os()}}" in
+		"macos")
+			dylib_extension="dylib"
+			;;
+		"windows")
+			dylib_extension="dll"
+			;;
+		*)
+			dylib_extension="so"
+	esac
+	echo "SELECT wasm_init('$(pwd)/target/release/libpg_ext_wasm.${dylib_extension}');" | psql -h $(pwd)/tests/pg -d postgres --echo-all
 	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test --release
 
 # Initialize Postgres.
