@@ -17,7 +17,7 @@ struct InstancesForeignDataWrapper {
 }
 
 impl Iterator for InstancesForeignDataWrapper {
-    type Item = Box<ForeignRow>;
+    type Item = Box<dyn ForeignRow>;
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.inner.pop() {

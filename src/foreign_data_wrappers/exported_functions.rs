@@ -20,7 +20,7 @@ struct ExportedFunctionsForeignDataWrapper {
 }
 
 impl Iterator for ExportedFunctionsForeignDataWrapper {
-    type Item = Box<ForeignRow>;
+    type Item = Box<dyn ForeignRow>;
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.inner.pop() {
