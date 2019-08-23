@@ -1,8 +1,12 @@
-# Build the `wasmer` extension.
+# Build the `wasm` extension.
 build:
 	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo build --release
 
-# Test the `wasmer` extension.
+# Install the `wasm` extension
+install:
+	cd src && make install
+
+# Test the `wasm` extension.
 test:
 	#!/usr/bin/env bash
 	set -euo pipefail
@@ -16,7 +20,7 @@ test:
 		*)
 			dylib_extension="so"
 	esac
-	cat src/wasm.sql | psql -h $(pwd)/tests/pg -d postgres
+	echo 'DROP EXTENSION IF EXISTS wasm; CREATE EXTENSION wasm;' | psql -h $(pwd)/tests/pg -d postgres
 	echo "SELECT wasm_init('$(pwd)/target/release/libpg_ext_wasm.${dylib_extension}');" | psql -h $(pwd)/tests/pg -d postgres --echo-all
 	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo test --release --tests
 

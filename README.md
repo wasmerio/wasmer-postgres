@@ -11,7 +11,7 @@
     <img src="https://img.shields.io/github/license/wasmerio/wasmer.svg" alt="License" valign="middle"></a>
 </p>
 
-`postgres-ext-wasm` is a Postgres extension for executing WebAssembly
+`wasm` is a Postgres extension for executing WebAssembly
 binaries. It's an original way to extend your favorite database
 capabilities.
 
@@ -23,21 +23,25 @@ it's fun to play with it.
 
 The project comes in two parts:
 
-  1. A dynamic library, and
-  2. A PL/pgSQL library.
+  1. A shared library, and
+  2. A PL/pgSQL extension.
   
 To compile the former, run `just build` (Postgres server headers are
-required, see `pg_config --includedir-server`). The latter is a single
-file located in `src/wasm.sql`. Once the PL/pgSQL is loaded, the
-`wasm_init` function must be called: its only argument is the absolute
-path to the dynamic library. It looks like this:
+required, see `pg_config --includedir-server`). To install the latter,
+run `just install`. After that, run `CREATE EXTENSION wasm` in a
+Postgres shell. A new function will appear: `wasm_init`; it must be
+called with the absolute path to the shared library. It looks like
+this:
 
 ```shell
-$ # Build the dynamic library.
+$ # Build the shared library.
 $ just build
 
-$ # Load the PL/pgSQL library.
-$ cat src/wasm.sql | \
+$ # Install the extension in the Postgres tree.
+$ just install
+
+$ # Activate the extension.
+$ echo 'CREATE EXTENSION wasm;' | \
       psql -h $host -d $database
 
 $ # Initialize the extension.
@@ -47,7 +51,7 @@ $ echo "SELECT wasm_init('$(pwd)/target/release/libpg_ext_wasm.dylib');" | \
 
 And you are ready to go!
 
-*Note*: On macOS, the dynamic library extension is `.dylib`, on Windows,
+*Note*: On macOS, the shared library extension is `.dylib`, on Windows,
 it is `.dll`, and on other distributions, it is `.so`.
 
 *Note 2*: Yes, you need [`just`][just].

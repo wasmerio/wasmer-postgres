@@ -1,0 +1,4 @@
+# wasm extension
+comment = 'A Postgres extension to run WebAssembly binaries.'
+default_version = '0.1.0'
+relocatable = true 
