@@ -34,12 +34,13 @@ jobs:
             export PATH="$HOME/.cargo/bin:$PATH"
             test -f $HOME/.cargo/bin/just || cargo install just
 
-      # Build the extension.
+      # Build and install the extension.
       - run:
           name: Build the extension
           command: |
             export PATH="/usr/lib/postgresql/10/bin:$HOME/.cargo/bin:$PATH"
             just build
+            just install
 
       # Run the extension test suites.
       - run:
@@ -62,8 +63,9 @@ workflows:
       - build-and-test:
           filters:
             branches:
-              only:
-                - trying
-                - staging
+              only: /.*/
+              #only:
+              #  - trying
+              #  - staging
             tags:
               only: /.*/
