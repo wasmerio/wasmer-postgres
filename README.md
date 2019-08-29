@@ -40,13 +40,8 @@ $ just build
 $ # Install the extension in the Postgres tree.
 $ just install
 
-$ # Activate the extension.
-$ echo 'CREATE EXTENSION wasm;' | \
-      psql -h $host -d $database
-
-$ # Initialize the extension.
-$ echo "SELECT wasm_init('$(pwd)/target/release/libpg_ext_wasm.dylib');" | \
-      psql -h $host -d $database
+$ # Activate and initialize the extension.
+$ just host=$host database=$database activate
 ```
 
 And you are ready to go!

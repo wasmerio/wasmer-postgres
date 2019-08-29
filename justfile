@@ -1,3 +1,6 @@
+host := "localhost"
+database := "postgres"
+
 # Build the `wasm` extension.
 build:
 	PG_INCLUDE_PATH=$(pg_config --includedir-server) cargo build --release
@@ -5,6 +8,14 @@ build:
 # Install the `wasm` extension
 install:
 	cd src && make install
+
+# Activate and initialize the extension.
+activate:
+	echo 'CREATE EXTENSION wasm;' | \
+		psql -h {{host}} -d {{database}}
+
+	echo "SELECT wasm_init('$(pwd)/target/release/libpg_ext_wasm.dylib');" | \
+		psql -h {{host}} -d {{database}}
 
 # Test the `wasm` extension.
 test:
