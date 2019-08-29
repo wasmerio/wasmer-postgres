@@ -40,7 +40,7 @@ jobs:
           command: |
             export PATH="/usr/lib/postgresql/10/bin:$HOME/.cargo/bin:$PATH"
             just build
-            just install
+            sudo /usr/local/cargo/bin/just install
 
       # Run the extension test suites.
       - run:
