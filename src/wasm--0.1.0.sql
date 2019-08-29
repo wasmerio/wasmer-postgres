@@ -9,7 +9,7 @@ BEGIN
     --
     BEGIN
         EXECUTE format(
-            'CREATE OR REPLACE FUNCTION wasm__instances_foreign_data_wrapper() RETURNS fdw_handler AS ''%s'', ''fdw_InstancesForeignDataWrapper'' LANGUAGE C STRICT',
+            'CREATE OR REPLACE FUNCTION wasm__instances_foreign_data_wrapper() RETURNS fdw_handler AS %L, ''fdw_InstancesForeignDataWrapper'' LANGUAGE C STRICT',
             dylib_pathname
         );
         DROP FOREIGN DATA WRAPPER IF EXISTS wasm__instances_foreign_data_wrapper CASCADE;
@@ -24,7 +24,7 @@ BEGIN
     --
     BEGIN
         EXECUTE format(
-            'CREATE OR REPLACE FUNCTION wasm__exported_functions_foreign_data_wrapper() RETURNS fdw_handler AS ''%s'', ''fdw_ExportedFunctionsForeignDataWrapper'' LANGUAGE C STRICT',
+            'CREATE OR REPLACE FUNCTION wasm__exported_functions_foreign_data_wrapper() RETURNS fdw_handler AS %L, ''fdw_ExportedFunctionsForeignDataWrapper'' LANGUAGE C STRICT',
             dylib_pathname
         );
         DROP FOREIGN DATA WRAPPER IF EXISTS wasm__exported_functions_foreign_data_wrapper CASCADE;
@@ -38,7 +38,7 @@ BEGIN
     -- Foreign Schema
     --
     BEGIN
-        EXECUTE format('DROP SCHEMA IF EXISTS %s CASCADE', wasm_schema_name);
+        EXECUTE format('DROP SCHEMA IF EXISTS %I CASCADE', wasm_schema_name);
         EXECUTE format('CREATE SCHEMA %I', wasm_schema_name);
 
         IMPORT FOREIGN SCHEMA wasm_instances FROM SERVER wasm_instances INTO wasm;
@@ -46,20 +46,20 @@ BEGIN
     END;
 
     -- Function `wasm__new_instance`
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__new_instance(text) RETURNS text AS ''%s'', ''pg_new_instance'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__new_instance(text) RETURNS text AS %L, ''pg_new_instance'' LANGUAGE C STRICT', dylib_pathname);
 
     -- Function `wasm__invoke_function_*`
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_0(text, text) RETURNS int8 AS ''%s'', ''pg_invoke_function_0'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_1'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_2(text, text, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_2'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_3(text, text, int8, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_3'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_4(text, text, int8, int8, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_4'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_5(text, text, int8, int8, int8, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_5'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_6(text, text, int8, int8, int8, int8, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_6'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_7(text, text, int8, int8, int8, int8, int8, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_7'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_8(text, text, int8, int8, int8, int8, int8, int8, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_8'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_9(text, text, int8, int8, int8, int8, int8, int8, int8, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_9'' LANGUAGE C STRICT', dylib_pathname);
-    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_10(text, text, int8, int8, int8, int8, int8, int8, int8, int8, int8, int8) RETURNS int8 AS ''%s'', ''pg_invoke_function_10'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_0(text, text) RETURNS int8 AS %L, ''pg_invoke_function_0'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_1(text, text, int8) RETURNS int8 AS %L, ''pg_invoke_function_1'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_2(text, text, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_2'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_3(text, text, int8, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_3'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_4(text, text, int8, int8, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_4'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_5(text, text, int8, int8, int8, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_5'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_6(text, text, int8, int8, int8, int8, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_6'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_7(text, text, int8, int8, int8, int8, int8, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_7'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_8(text, text, int8, int8, int8, int8, int8, int8, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_8'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_9(text, text, int8, int8, int8, int8, int8, int8, int8, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_9'' LANGUAGE C STRICT', dylib_pathname);
+    EXECUTE format('CREATE OR REPLACE FUNCTION wasm__invoke_function_10(text, text, int8, int8, int8, int8, int8, int8, int8, int8, int8, int8) RETURNS int8 AS %L, ''pg_invoke_function_10'' LANGUAGE C STRICT', dylib_pathname);
 
     RETURN TRUE;
 END;
@@ -115,7 +115,7 @@ BEGIN
             'DECLARE' ||
             '    output %5$s;' ||
             'BEGIN' ||
-            '    SELECT wasm__invoke_function_%4$s(''%6$s'', ''%2$s''%7$s) INTO STRICT output;' ||
+            '    SELECT wasm__invoke_function_%4$s(%6$L, %2$L%7$s) INTO STRICT output;' ||
             '    RETURN output;' ||
             'END;' ||
             '$F$ LANGUAGE plpgsql;',
