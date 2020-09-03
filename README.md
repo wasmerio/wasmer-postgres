@@ -1,21 +1,17 @@
-<p align="center">
-  <a href="https://wasmer.io" target="_blank" rel="noopener">
-    <img width="300" src="https://raw.githubusercontent.com/wasmerio/wasmer/master/assets/logo.png" alt="Wasmer logo">
-  </a>
-</p>
+# <img height="48" src="https://wasmer.io/static/icons/favicon-96x96.png" alt="Wasmer logo" valign="middle"> Wasmer Postgres [Wasmer Slack Channel](https://img.shields.io/static/v1?label=chat&message=on%20Slack&color=green)](https://slack.wasmer.io)
 
-<p align="center">
-  <a href="https://spectrum.chat/wasmer">
-    <img src="https://withspectrum.github.io/badge/badge.svg" alt="Join the Wasmer Community" valign="middle"></a>
-  <a href="https://github.com/wasmerio/wasmer/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/wasmerio/wasmer.svg" alt="License" valign="middle"></a>
-</p>
+A complete and mature WebAssembly runtime for Postgres based on [Wasmer].
+It's an original way to extend your favorite database capabilities.
 
-`wasm` is a Postgres extension for executing WebAssembly
-binaries. It's an original way to extend your favorite database
-capabilities.
+Features:
 
-*Current status*: The project is still in heavy development. This is a
+  * **Easy to use**: The `wasmer` API mimics the standard WebAssembly API,
+  * **Fast**: `wasmer` executes the WebAssembly modules as fast as
+    possible, close to **native speed**,
+  * **Safe**: All calls to WebAssembly will be fast, but more
+    importantly, completely safe and sandboxed.
+
+> Note: The project is still in heavy development. This is a
 0.1.0 version. Some API are missing and are under implementation. But
 it's fun to play with it.
 
