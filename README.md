@@ -1,6 +1,7 @@
-# <img height="48" src="https://wasmer.io/static/icons/favicon-96x96.png" alt="Wasmer logo" valign="middle"> Wasmer Postgres [Wasmer Slack Channel](https://img.shields.io/static/v1?label=chat&message=on%20Slack&color=green)](https://slack.wasmer.io)
+# <img height="48" src="https://wasmer.io/images/icons/favicon-96x96.png" alt="Wasmer logo" valign="middle"> Wasmer Postgres [![Wasmer Slack Channel](https://img.shields.io/static/v1?label=chat&message=on%20Slack&color=green)](https://slack.wasmer.io)
 
-A complete and mature WebAssembly runtime for Postgres based on [Wasmer].
+
+A complete and mature WebAssembly runtime for Postgres based on [Wasmer](https://wasmer.io).
 It's an original way to extend your favorite database capabilities.
 
 Features:
